@@ -13,10 +13,9 @@ public class RestaurantRouter {
 
     @Bean
     public RouterFunction<ServerResponse> route(RestaurantHandler restaurantHandler) {
-
         return RouterFunctions
                 .route(RequestPredicates.GET("/"), restaurantHandler::home)
-                .andRoute(RequestPredicates.GET("/users"), restaurantHandler::getClients)
+                .andRoute(RequestPredicates.GET("/clients"), restaurantHandler::getClients)
                 .andRoute(RequestPredicates.GET("/admins"), restaurantHandler::getAdministrators)
                 .andRoute(RequestPredicates.GET("/menu"), restaurantHandler::getMenu)
                 .andRoute(RequestPredicates.GET("/orders"), restaurantHandler::getOrders)
