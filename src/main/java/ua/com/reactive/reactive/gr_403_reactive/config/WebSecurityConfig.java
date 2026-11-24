@@ -11,6 +11,11 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import ua.com.reactive.reactive.gr_403_reactive.service.UserService;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -40,11 +45,12 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-
         return http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchange ->
-                        exchange.pathMatchers("/", "/registration")
-                                .permitAll()
+                        exchange.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .pathMatchers("/", "/registration").permitAll()
+                                .pathMatchers("/api/**").permitAll()
                                 .pathMatchers("/users").hasRole("User")
                                 .pathMatchers("/admin", "/admins").hasRole("Admin")
                                 .anyExchange().authenticated()
@@ -54,4 +60,15 @@ public class WebSecurityConfig {
                 .authenticationManager(authenticationManager())
                 .build();
     }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:8081"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
 }
